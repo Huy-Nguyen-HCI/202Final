@@ -1,0 +1,82 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper, top=15mm, left=15mm, right=10mm, bottom = 15mm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{indentfirst}
+\usepackage{enumerate}
+\usepackage{listings}
+
+\title{Chap 6 solutions}
+\author{Huy Nguyen}
+\newcommand{\co}{\texttt}
+\renewcommand{\and}{\ \&\& \ }
+
+\lstset{
+  backgroundcolor = \color{white},
+  frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  otherkeywords = {obj, SEL, @, BOOL},
+  commentstyle=\color{red},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\begin{document}
+
+\section{Problem 6.2}
+Let $b[i]$ be the minimum total penalty for stopping at hotel $a_i$, $1 \le i \le n$. We have $$b[i] = \min_{1 \le j < i} \{ b[j] + (200 - (b[i] - b[j]))^2\}.$$
+Also record the value $j$ which yields $\displaystyle \min_{1 \le j < i} \{ b[j] + (200 - (b[i] - b[j]))^2$ and set \co{b[i].prev = b[j]}. Backtrack from $b[n]$ to get the sequence of hotels to stop by.
+
+\section{Problem 6.3}
+Let $S[i]$ be the maximum total profit we get from building some restaurants in $\{m_1, m_2, \ldots, m_i\}$. Consider 2 cases:
+\begin{enumerate}[(1)]
+	\item If restaurant $m_i$ should not be built, then $S[i] = S[i-1]$.
+	\item If restaurant $m_i$ should be built, then let $c_i$ be the maximum index $j$ which yields $m_i - m_j \ge k$. We then have $\displaystyle S[i] = p_i + S[c_i]$.
+\end{enumerate}
+Therefore in general, $$S_i = \max \{ S[i-1], p_i + S[c_i]\}.$$
+To get the sequence of restaurants, keep an array $R[n]$ such that $R[i] = 1$ if restaurant $i$ is built in the optimal solution, and $R[i] = 0$ otherwise. When we calculate $S[i]$, if the max falls to case (1), $R[i] = 0$. Else, $R[i] = 1$. Output all the $R[i]$s that are $1$.
+
+\section{Problem 6.4}
+Consider an array $S[n]$ where $S[i] = \co{true}$ if the substring $s_1 s_2 \ldots s_i$ is a valid string, and \co{false} otherwise. We have $S[1] = \co{dict(s[1])}$ and 
+$$
+\begin{aligned}
+S[i] = & \ (S[1] \and \co{dict(s[2 .. i]}) \\ 
+& || (S[2] \and \co{dict(s[3..i])} \\ 
+& || \ldots \\
+& || (S[i-1] \and \co{dict(s[i..i])})), 
+\end{aligned}$$
+where $s[j..i]$ is $s_j s_{j+1} \ldots s_i$.
+
+\section{Problem 6.6}
+Let the input string be $x_1 x_2 \ldots x_n$. \\
+Let $Z = \{a,b,c\}$ and let $T[i,j] \subset Z$ be the set of the possible values that the product $x_i x_{i+1} \ldots x_{j}$ can yield with all possible parenthesizations. \\
+We see that $T[i,i] = x_i$ for all $1 \le i \le n$. We need to compute $T[1,n]$. \\
+Define $A \times B$ as $\{ a \cdot b | a \in A, b \in B\}$. \\
+We note that $T[i, i+1] = T[i,i] \bigcup T[i+1, i+1]$ and $T[i,i+2] = (T[i,i] \times T[i+1, i+2]) \bigcup (T[i,i+1] \times T[i+2,i+2])$ (to put it another way, $abc$ can be written as $(a)(bc)$ or $(ab)(c)$). \\
+We therefore see that we already have $$T[1,1], T[2,2], T[3,3], \ldots,$$
+from which we can calculate $$T[1,2], T[2,3], T[3,4], \ldots,$$
+from which we can calculate $$T[1,3], T[2,4], T[3,5], \ldots $$
+and eventually we can expand to $T[1,n]$, which is what we need to find.
+
+In other words, $$T[i, i + s] = \bigcup_{i \le k < i + s} (T[i,k] \times T[k+1, i + s]).$$
+
+The algorithm is as follows:
+\begin{lstlisting}
+	for i = 1 to n: T[i,i] = x[i].
+	for s = 1 to n-1:
+		for i = 1 to n - s:
+			T[i, i + s] = empty
+			for k = 1 to i + s - 1:
+				T[i, i + s] = T[i, i + s] UNION (T[i, k] * T[k+1,s])
+	If a is in T[1,n] return true. Else, return false.
+\end{lstlisting}
+\end{document}
