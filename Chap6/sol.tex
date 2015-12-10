@@ -1,9 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage[a4paper, top=15mm, left=15mm, right=10mm, bottom = 15mm]{geometry}
 \usepackage{amsmath, amssymb}
-\usepackage{indentfirst}
 \usepackage{enumerate}
-\usepackage{listings}
+\usepackage{listings, color}
 
 \title{Chap 6 solutions}
 \author{Huy Nguyen}
@@ -65,10 +64,8 @@ We note that $T[i, i+1] = T[i,i] \bigcup T[i+1, i+1]$ and $T[i,i+2] = (T[i,i] \t
 We therefore see that we already have $$T[1,1], T[2,2], T[3,3], \ldots,$$
 from which we can calculate $$T[1,2], T[2,3], T[3,4], \ldots,$$
 from which we can calculate $$T[1,3], T[2,4], T[3,5], \ldots $$
-and eventually we can expand to $T[1,n]$, which is what we need to find.
-
+and eventually we can expand to $T[1,n]$, which is what we need to find.\\
 In other words, $$T[i, i + s] = \bigcup_{i \le k < i + s} (T[i,k] \times T[k+1, i + s]).$$
-
 The algorithm is as follows:
 \begin{lstlisting}
 	for i = 1 to n: T[i,i] = x[i].
@@ -79,4 +76,28 @@ The algorithm is as follows:
 				T[i, i + s] = T[i, i + s] UNION (T[i, k] * T[k+1,s])
 	If a is in T[1,n] return true. Else, return false.
 \end{lstlisting}
+
+\section{Problem 6.7}
+Let the input string be $x_1 x_2 \ldots x_n$. Let $E[i,j]$ be the length of the longest palindromic subsequence in $x[i..j]$. We have $$\begin{cases} T[i.i] = 1 \\ T[i,i+1] = 2 \text{ if } x[i] = x[i+1] \text{ and } 0 \text{ if } x[i] \ne x[i+1] \\ T[i,j] = T[i+1,j+1] \text{ if } x[i] = x[j] \text{ and } \max \{T[i+1,j], T[i,j+1]\} \text{ else} \end{cases}$$
+
+\section{Problem 6.8}
+Let $E[i,j]$ be the length of the largest common substring of $x_1 x_2 \ldots x_i$ and $y_1 y_2 \ldots y_j$ such that $x_i = y_j$. We see that $E[1,j] = 1$ if $x_1 = y_j$ and $0$ otherwise. Similarly, $E[j,1] = 1$ if $y_1 = x_j$ and $0$ otherwise.\\
+In general, we have $$E[i,j] = \begin{cases} E[i-1,j-1] + 1 \text{ if } x_i = y_j \\ 0 \text{ if } x_i \ne y_j \end{cases}$$
+
+\section{Problem 6.9}
+Let the input string be $x[0..n-1]$ and the input breakpoint array be $y[1..m]$. Convert $y$ to $y[0..m+1]$ and let $y[0] = -1, y[m+1] = n-1$. \\
+Let $M(i,j)$ be 
+$$\begin{cases} M(i,i)=0\text{, }\forall i: 0 \le i \le m + 1 \\
+M(i,i + 1)=0\text{, }\forall i: 0 \le i \le m + 1\\
+M(i,j)=\left(y[j]-y[i]\right) + \displaystyle \min_{l: i < l < j}\{M(i,l) + M(l,j)\}
+\end{cases}$$
+
+\section{Problem 6.10}
+Let $E[i,j]$ be the probability of obtaining exactly $i$ heads when $j$ coins $c_1, c_2, \ldots, c_j$ with head-probability $p_1, p_2, \ldots, p_j$ are tossed.
+We have $E[0,j] = (1-p_1)(1-p_2) \ldots (1-p_j)$ and $$E[i,j] = 1 - \sum_{k=1}^j E[i-k,j].$$
+
+\section{Problem 6.11}
+Let $E[i,j]$ be the longest common subsequence of $x_1 x_2 \ldots x_j$ and $y_1 y_2 \ldots y_j$. \\
+We have $E[1,j] = 1$ if $x_1 = y_j$, for all $1 \le j \le m$. Similarly, $E[j,1] = 1$ if $x_j = y_1$, for all $1 \le j \le n$. \\
+In general we have $$E[i,j] = \begin{cases} E[i-1,j-1] + 1 \text{ if } x_i = y_j \\ \max \{E[i-1,j] + E[i,j-1] \} \text{ if } x_i \ne y_j. \end{cases}$$
 \end{document}
