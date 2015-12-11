@@ -66,7 +66,30 @@ Kruskal's algorithm will iterate $n$ times and, at time $i$, pick edge $e_i$, or
 Negate all the edge weights in the input graph and use Kruskal's algorithm to find the minimum spanning tree in the new graph. This tree is the maximum spanning tree in the original graph.
 
 \section{Problem 5.8}
+We use Prim's algorithm to build a minimum spanning tree in $G$. \\
+Start building the MST from a vertex that is not $S$. Now assume we have reached the step where we have the tree current tree $T$ and we are about to add $S$ to $T(V)$. In other words, the next edge to be added to $T(E)$ is the edge $SA$ connecting $S$ to a vertex $A \in T(V)$. $(*)$\\
+We prove that $SA$ is also the shortest path from $S$ to $A$ and therefore $T$ and the tree of shortest paths from $SA$ share the same edge $SA$. \\
+Assume otherwise, the shortest path from $S$ to $A$ is not $SA$. Then there exists a vertex $B \ne A$ such that the shortest path from $S$ to $A$ consists of the shortest path from $S$ to $B$ and $BA$. So $$d(S,B) + BA < SA \Rightarrow BA < SA.$$
+We consider two cases:
+\begin{itemize}
+  \item If $B \notin T(V)$ then because $BA < SA$, $SA$ is not the lightest edge that connects $T$ to a vertex outside of it.
+  \item If $B \in T(V)$, call $I$ and $K$ two vertices on the path from $S$ to $B$ such that $I \in T(V), K \notin T(V)$ ($I$ can be $B$ and $K$ can be $S$). Then $SA > d(S,B) = d(S,K) + IK + d(I,B) \ge IK$, so again $SA$ is not the lightest edge.
+\end{itemize}
+Both cases contradict $(*)$. Thus we have proven that the minimum spanning tree and the tree of shortest paths from a vertex $S$ always share an edge.
 
+\section{Problem 5.10}
+Start with a MST $T_H \in MST_H$ and $T_G \in MST_G$. \\
+While there is an edge $e \in T_G \bigcap H$ such that $e \notin T_H$ do:
+\begin{enumerate}
+  \item Add $e$ to $T_H$ to create a cycle $C$.
+  \item We see that for all $e' \in C, e' \ne e$ we have $w(e') \le w(e)$. Otherwise if $w(e') > w(e)$ we should have picked $e$, not $e'$ when building the MST $T_H$, according to Kruskal's algorithm.
+  \item Let $e = (u,v)$, so $u, v \in H$. We see that $e \in T_G$ so it connects two previously separate connected components, which we call $U$ and $V$, and assume that $u \in U, v \in V$. Because $u$ and $v$ are in $H$ and $T_H$ is the MST of $H$, there exists an edge $e'' \in C \bigcap T_H$ that connects $U$ and $V$. 
+  \item From Step 2 we get $w(e'') \le w(e)$. If $w(e'') < w(e)$ then when we built $T_G$ we should have picked $e''$ instead of $e$ to connect $U$ and $V$. Therefore $w(e'') = w(e)$. 
+  \item Let $T'_H = T_H \bigcup \{ e \} - \{ e''\}$ then $T_H$ is also a MST in $H$.
+  \item Rename $T'_H \to T_H$ and check the loop condition.
+\end{enumerate}
+
+After the loop we have $T_G \bigcap H \subset T_H$.
 
 \chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
