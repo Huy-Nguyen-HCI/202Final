@@ -4,6 +4,8 @@
 \usepackage{enumerate}
 \usepackage{listings, color}
 \usepackage{hyperref}
+\usepackage{enumerate}
+
 
 \title{CS 202 Review}
 \author{Huy Nguyen}
@@ -22,7 +24,7 @@
   numbers=none,
   numberstyle=\tiny\color{gray},
   keywordstyle=\color{blue},
-  otherkeywords = {obj, SEL, @, BOOL},
+  otherkeywords = {},
   commentstyle=\color{red},
   stringstyle=\color{mauve},
   breaklines=true,
@@ -33,6 +35,38 @@
 \begin{document}
 
 \tableofcontents
+
+\chapter[Chapter 5 Solution]{Greedy algorithm}
+
+\section{Problem 5.3}
+Run DFS on the graph to detect a cycle edge. Return YES as soon as a cycle edge is found. Else, if there is no cycle edge, return NO.\\
+This algorithm has $O(|V|)$ runtime because we note that $G$ is either a tree (in which case $|E| = |V| - 1$) or it is not (in which case $|E| > |V| - 1)$.
+\begin{itemize}
+  \item If $G$ is a tree then we will not be able to detect any back edge. DFS will traverse the entire graph, which takes $O(|V| + |E|)$, but because $|E| = |V| - 1$, this is $O(|V|)$.
+  \item If $G$ is not a tree then we can find a back edge after traversing at most $|V|$ edges because the edges picked by DFS form a tree, and any tree in the original graph can have at most $|V|$ vertices.
+\end{itemize}
+
+\section{Problem 5.4}
+We note that a connect component with $m$ vertices must have at least $m - 1$ edges\footnote{since the component is connected, we can build a minimum spanning tree in it; this tree has $m$ vertices and $m-1$ edges, so the number of edges in the component must be at least $m-1$.}. \\
+Let the number of vertices in component $i$ be $m_i, \ i = 1,2,\ldots,k$. We have $\displaystyle \sum_{i=1}^k m_i = n$.\\
+The number of edges in the graph is the total number of edges in all components, which is at least $$\sum_{i=1}^k (m_i - 1) = n - k.$$
+
+
+\section{Problem 5.5}
+\begin{enumerate}[(a)]
+  \item We follow Kruskal's algorithm to build the minimum spanning tree: at each step, pick the edge with the least weight that does not create a cycle. Because all edge weights are increased by $1$, the weight of any edge relative to all other edges is the same, so Kruskal's will produce the same result.
+  \item The shortest path will change. Consider the quadrilateral $ABCD$ with $$AB = BC = CD = 2, AD = 7.$$ Currently the shortest path from $A$ to $D$ is $A \to B \to C \to D$. If we increase the weight of all edges by $1$ then $AB = BC = CD = 3, DA = 8$, so the shortest path from $A$ to $D$ is the $A \to D$.
+\end{enumerate}
+
+\section{Problem 5.6}
+Sort the edge by their weights $$e_1 < e_2 < \ldots < e_n.$$
+Kruskal's algorithm will iterate $n$ times and, at time $i$, pick edge $e_i$, or the $i-$th smallest edge in the graph. Because the edge weights are distinct, the $i-th$ smallest edge in the graph is distinct for all $1 \le i \le n$. Therefore the minimum spanning tree is unique.
+
+\section{Problem 5.7}
+Negate all the edge weights in the input graph and use Kruskal's algorithm to find the minimum spanning tree in the new graph. This tree is the maximum spanning tree in the original graph.
+
+\section{Problem 5.8}
+
 
 \chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
