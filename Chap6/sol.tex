@@ -78,7 +78,7 @@ The algorithm is as follows:
 \end{lstlisting}
 
 \section{Problem 6.7}
-Let the input string be $x_1 x_2 \ldots x_n$. Let $T[i,j]$ be the length of the longest palindromic subsequence in $x[i..j]$. We have $$\begin{cases} T[i.i] = 1 \\ T[i,i+1] = 2 \text{ if } x[i] = x[i+1] \text{ and } 0 \text{ if } x[i] \ne x[i+1] \\ T[i,j] = T[i+1,j-1] \text{ if } x[i] = x[j] \text{ and } \max \{T[i+1,j], T[i,j-1]\} \text{ else} \end{cases}$$
+Let the input string be $x_1 x_2 \ldots x_n$. Let $T[i,j]$ be the length of the longest palindromic subsequence in $x[i..j]$. We have $$\begin{cases} T[i.i] = 1 \\ T[i,i+1] = 2 \text{ if } x[i] = x[i+1] \text{ and } 0 \text{ if } x[i] \ne x[i+1] \\ T[i,j] = T[i+1,j-1] + 2 \text{ if } x[i] = x[j] \text{ and } \max \{T[i+1,j], T[i,j-1]\} \text{ else} \end{cases}$$
 
 \section{Problem 6.8}
 Let $E[i,j]$ be the length of the largest common substring of $x_1 x_2 \ldots x_i$ and $y_1 y_2 \ldots y_j$ such that $x_i = y_j$. We see that $E[1,j] = 1$ if $x_1 = y_j$ and $0$ otherwise. Similarly, $E[j,1] = 1$ if $y_1 = x_j$ and $0$ otherwise.\\
@@ -103,4 +103,8 @@ In general we have $$E[i,j] = \begin{cases} E[i-1,j-1] + 1 \text{ if } x_i = y_j
 
 \section{Problem 6.12}
 Let $d[i,j]$ be the distance between point $i$ and $j$. We have $$\begin{cases} A[i,i] = 0 \\ A[i, i + 1] = 0 \\ A[i, i+2] = 0 \\ A[i,j] = \displaystyle \min_{i < k < j} \{ A[i,k] + A[k,j] + d[i,k] + d[k,j]\} \end{cases}$$
+
+\section{Problem 6.13}
+Let $E[i,j]$ be the maximum value the first player can have by picking cards from the set of cards $s_i, s_{i+1}, \ldots, s_j$. \\
+We see that $E[i,j] = 0$ if $i \le j$. In general, $$\begin{aligned} E[i,j] = \max\{ & v_i + \min \{ E[i + 2, j] - v_{i+1}, E[i + 1, j - 1] - v_j \}, \\ & v_j + \min \{ E[i+1,j-2] - v_{j-1}, E[i+2,j-1] - v_{i+1}\}\}. \end{aligned}$$
 \end{document}
