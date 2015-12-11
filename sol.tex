@@ -1,10 +1,11 @@
-\documentclass[12pt]{article}
+\documentclass[12pt]{report}
 \usepackage[a4paper, top=15mm, left=15mm, right=10mm, bottom = 15mm]{geometry}
 \usepackage{amsmath, amssymb}
 \usepackage{enumerate}
 \usepackage{listings, color}
+\usepackage{hyperref}
 
-\title{Chap 6 solutions}
+\title{CS 202 Review}
 \author{Huy Nguyen}
 \newcommand{\co}{\texttt}
 \renewcommand{\and}{\ \&\& \ }
@@ -31,6 +32,9 @@
 
 \begin{document}
 
+\tableofcontents
+
+\chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
 Let $b[i]$ be the minimum total penalty for stopping at hotel $a_i$, $1 \le i \le n$. We have $$b[i] = \min_{1 \le j < i} \{ b[j] + (200 - (a[i] - a[j]))^2\}.$$
 Also record the value $j$ which yields $\displaystyle \min_{1 \le j < i} \{ b[j] + (200 - (a[i] - a[j]))^2\}$ and set \co{b[i].prev = b[j]}. Backtrack from $b[n]$ to get the sequence of hotels to stop by.
@@ -38,8 +42,8 @@ Also record the value $j$ which yields $\displaystyle \min_{1 \le j < i} \{ b[j]
 \section{Problem 6.3}
 Let $S[i]$ be the maximum total profit we get from building some restaurants in $\{m_1, m_2, \ldots, m_i\}$. Consider 2 cases:
 \begin{enumerate}[(1)]
-	\item If restaurant $m_i$ should not be built, then $S[i] = S[i-1]$.
-	\item If restaurant $m_i$ should be built, then let $c_i$ be the maximum index $j$ which yields $m_i - m_j \ge k$. We then have $\displaystyle S[i] = p_i + S[c_i]$.
+  \item If restaurant $m_i$ should not be built, then $S[i] = S[i-1]$.
+  \item If restaurant $m_i$ should be built, then let $c_i$ be the maximum index $j$ which yields $m_i - m_j \ge k$. We then have $\displaystyle S[i] = p_i + S[c_i]$.
 \end{enumerate}
 Therefore in general, $$S_i = \max \{ S[i-1], p_i + S[c_i]\}.$$
 To get the sequence of restaurants, keep an array $R[n]$ such that $R[i] = 1$ if restaurant $i$ is built in the optimal solution, and $R[i] = 0$ otherwise. When we calculate $S[i]$, if the max falls to case (1), $R[i] = 0$. Else, $R[i] = 1$. Output all the $R[i]$s that are $1$.
@@ -68,13 +72,13 @@ and eventually we can expand to $T[1,n]$, which is what we need to find.\\
 In other words, $$T[i, i + s] = \bigcup_{i \le k < i + s} (T[i,k] \times T[k+1, i + s]).$$
 The algorithm is as follows:
 \begin{lstlisting}
-	for i = 1 to n: T[i,i] = x[i].
-	for s = 1 to n-1:
-		for i = 1 to n - s:
-			T[i, i + s] = empty
-			for k = 1 to i + s - 1:
-				T[i, i + s] = T[i, i + s] UNION (T[i, k] * T[k+1,s])
-	If a is in T[1,n] return true. Else, return false.
+  for i = 1 to n: T[i,i] = x[i].
+  for s = 1 to n-1:
+    for i = 1 to n - s:
+      T[i, i + s] = empty
+      for k = 1 to i + s - 1:
+        T[i, i + s] = T[i, i + s] UNION (T[i, k] * T[k+1,s])
+  If a is in T[1,n] return true. Else, return false.
 \end{lstlisting}
 
 \section{Problem 6.7}
@@ -94,7 +98,7 @@ M(i,j)=\left(y[j]-y[i]\right) + \displaystyle \min_{l: i < l < j}\{M(i,l) + M(l,
 
 \section{Problem 6.10}
 Let $E[i,j]$ be the probability of obtaining exactly $i$ heads when $j$ coins $c_1, c_2, \ldots, c_j$ with head-probability $p_1, p_2, \ldots, p_j$ are tossed.
-We have $E[0,j] = (1-p_1)(1-p_2) \ldots (1-p_j)$ and $$E[i,j] = 1 - \sum_{k=1}^i E[i-k,j].$$
+We have $$\begin{cases} E[0,0] = 1 \\ E[0,j] = E[0,j-1] \cdot (1-p_j) \ \forall 1 \le j \le n \\ E[i,0] = 0 \ \forall 1 \le i \le k \\ E[i,j] = p_j \cdot E[i-1,j-1] + (1-p_j) \cdot E[i,j-1] \end{cases}$$
 
 \section{Problem 6.11}
 Let $E[i,j]$ be the longest common subsequence of $x_1 x_2 \ldots x_j$ and $y_1 y_2 \ldots y_j$. \\
@@ -105,6 +109,7 @@ In general we have $$E[i,j] = \begin{cases} E[i-1,j-1] + 1 \text{ if } x_i = y_j
 Let $d[i,j]$ be the distance between point $i$ and $j$. We have $$\begin{cases} A[i,i] = 0 \\ A[i, i + 1] = 0 \\ A[i, i+2] = 0 \\ A[i,j] = \displaystyle \min_{i < k < j} \{ A[i,k] + A[k,j] + d[i,k] + d[k,j]\} \end{cases}$$
 
 \section{Problem 6.13}
+A sequence where a greedy approach would fail is $$1000 \quad 2000 \quad 1.$$
 Let $E[i,j]$ be the maximum value the first player can have by picking cards from the set of cards $s_i, s_{i+1}, \ldots, s_j$. \\
 We see that $E[i,j] = 0$ if $i \le j$. In general, $$\begin{aligned} E[i,j] = \max\{ & v_i + \min \{ E[i + 2, j] - v_{i+1}, E[i + 1, j - 1] - v_j \}, \\ & v_j + \min \{ E[i+1,j-2] - v_{j-1}, E[i+2,j-1] - v_{i+1}\}\}. \end{aligned}$$
 \end{document}
