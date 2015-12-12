@@ -91,10 +91,31 @@ While there is an edge $e \in T_G \bigcap H$ such that $e \notin T_H$ do:
 
 After the loop we have $T_G \bigcap H \subset T_H$.
 
+\section{Problem 5.16}
+\url{http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2012/assignments/MIT6_046JS12_ps9_sol.pdf}
+
+\section{Problem 5.20}
+{\bf Perfect matching.} \\
+Let $G(V,E)$ be the input graph, $S$ be the queue that contains all leaf nodes and $M$ be the perfect matching. \\
+The algorithm is as follows:
+\begin{lstlisting}
+  all leaf nodes to S.
+  while S is not empty:
+    u = S.pop()
+    v = u.adjacent
+    M.add((u,v))
+    Remove u, v from V and all edges connected to v from E
+    Add new leaf nodes to S
+  return |V| = 0
+\end{lstlisting}
+{\bf Feedback edge set.} \\
+
+
 \chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
 Let $b[i]$ be the minimum total penalty for stopping at hotel $a_i$, $1 \le i \le n$. We have $$b[i] = \min_{1 \le j < i} \{ b[j] + (200 - (a[i] - a[j]))^2\}.$$
 Also record the value $j$ which yields $\displaystyle \min_{1 \le j < i} \{ b[j] + (200 - (a[i] - a[j]))^2\}$ and set \co{b[i].prev = b[j]}. Backtrack from $b[n]$ to get the sequence of hotels to stop by.
+
 
 \section{Problem 6.3}
 Let $S[i]$ be the maximum total profit we get from building some restaurants in $\{m_1, m_2, \ldots, m_i\}$. Consider 2 cases:
