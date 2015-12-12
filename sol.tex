@@ -47,7 +47,7 @@ This algorithm has $O(|V|)$ runtime because we note that $G$ is either a tree (i
 \end{itemize}
 
 \section{Problem 5.4}
-We note that a connect component with $m$ vertices must have at least $m - 1$ edges\footnote{since the component is connected, we can build a minimum spanning tree in it; this tree has $m$ vertices and $m-1$ edges, so the number of edges in the component must be at least $m-1$.}. \\
+We note that a connected component with $m$ vertices must have at least $m - 1$ edges\footnote{since the component is connected, we can build a minimum spanning tree in it; this tree has $m$ vertices and $m-1$ edges, so the number of edges in the component must be at least $m-1$.}. \\
 Let the number of vertices in component $i$ be $m_i, \ i = 1,2,\ldots,k$. We have $\displaystyle \sum_{i=1}^k m_i = n$.\\
 The number of edges in the graph is the total number of edges in all components, which is at least $$\sum_{i=1}^k (m_i - 1) = n - k.$$
 
@@ -55,7 +55,7 @@ The number of edges in the graph is the total number of edges in all components,
 \section{Problem 5.5}
 \begin{enumerate}[(a)]
   \item We follow Kruskal's algorithm to build the minimum spanning tree: at each step, pick the edge with the least weight that does not create a cycle. Because all edge weights are increased by $1$, the weight of any edge relative to all other edges is the same, so Kruskal's will produce the same result.
-  \item The shortest path will change. Consider the quadrilateral $ABCD$ with $$AB = BC = CD = 2, AD = 7.$$ Currently the shortest path from $A$ to $D$ is $A \to B \to C \to D$. If we increase the weight of all edges by $1$ then $AB = BC = CD = 3, DA = 8$, so the shortest path from $A$ to $D$ is the $A \to D$.
+  \item The shortest path will change. Consider the quadrilateral $ABCD$ with $$AB = BC = CD = 2, AD = 7.$$ Currently the shortest path from $A$ to $D$ is $A \to B \to C \to D$. If we increase the weight of all edges by $1$ then $AB = BC = CD = 3, DA = 8$, so the shortest path from $A$ to $D$ is $A \to D$.
 \end{enumerate}
 
 \section{Problem 5.6}
@@ -67,9 +67,9 @@ Negate all the edge weights in the input graph and use Kruskal's algorithm to fi
 
 \section{Problem 5.8}
 We use Prim's algorithm to build a minimum spanning tree in $G$. \\
-Start building the MST from a vertex that is not $S$. Now assume we have reached the step where we have the tree current tree $T$ and we are about to add $S$ to $T(V)$. In other words, the next edge to be added to $T(E)$ is the edge $SA$ connecting $S$ to a vertex $A \in T(V)$. $(*)$\\
-We prove that $SA$ is also the shortest path from $S$ to $A$ and therefore $T$ and the tree of shortest paths from $SA$ share the same edge $SA$. \\
-Assume otherwise, the shortest path from $S$ to $A$ is not $SA$. Then there exists a vertex $B \ne A$ such that the shortest path from $S$ to $A$ consists of the shortest path from $S$ to $B$ and $BA$. So $$d(S,B) + BA < SA \Rightarrow BA < SA.$$
+Start building the MST from a vertex that is not $S$. Now assume we have reached the step where we have the tree current tree $T$ and we are about to add $S$ to $T(V)$. In other words, the next edge to be added to $T(E)$ is the edge $SA$ connecting $S$ to a vertex $A \in T(V)$, which means $SA$ is the lightest edge that connects $T$ a vertex outside of $T$. $(*)$\\
+We prove that $SA$ is also the shortest path from $S$ to $A$ and therefore $T$ and the tree of shortest paths from $S$ share the same edge $SA$. \\
+Assume otherwise, the shortest path from $S$ to $A$ is not $SA$. Then there exists a vertex $B \ne A$ such that the shortest path from $S$ to $A$ consists of the shortest path from $S$ to $B$ and $BA$. So $$d(S,B) + BA < SA.$$
 We consider two cases:
 \begin{itemize}
   \item If $B \notin T(V)$ then because $BA < SA$, $SA$ is not the lightest edge that connects $T$ to a vertex outside of it.
@@ -109,7 +109,37 @@ The algorithm is as follows:
   return |V| = 0
 \end{lstlisting}
 {\bf Feedback edge set.} \\
+Let $F$ be the feedback edge set. Negate all the edges in $G$ to get a graph $G'$. Use Kruskal's algorithm to build a minimum spanning tree $T$ in $G'$. At each step, after we pop an edge $e$, if adding $e$ to $T$ does not form a cycle, then add $e$ to $T$, else add $e$ to $F$. As we go back to the original graph, $T$ is the maximum spanning tree and $F$ is the feedback set edge with minimum weight.
 
+\section{Problem 5.21}
+\begin{enumerate}[(a)]
+\item If no MST contain $e$, we are done. If {\bf there is a MST $T$ that contains $e$}, removing $e$ from $T$ will separate it into two connected components $M$ and $N$. Since $e$ is part of a cycle, there exists another edge $e'$ that connects $M$ and $N$. Then $T \bigcup \{ e' \} - \{e\}$ is also a MST with $w(T') \le w(T)$. 
+\begin{itemize}
+  \item If $w(T') < w(T)$ then we have a contradiction because $T$ is a MST, so no MST can contain $e$. 
+  \item If $w(T') = w(T)$ then $e$ and $e'$ are both the heaviest edges in the cycle. $T$ contains $e$ and not $e'$, while $T'$ contains $e'$ and not $e$. In other words, there is a MST that does not contain the heaviest edge in a cycle.
+\end{itemize}
+\item If we get an edge $e$ that is part of a cycle, then because the edges are ordered in decreasing weights, $e$ is the heaviest edge in that cycle. By the property in (a), $e$ cannot belong a MST. Therefore we can remove it.
+\item To check if an edge $e$ belongs to a cycle:
+  \begin{itemize}
+    \item Let $e = (u,v)$.
+    \item Remove $e$ from the graph and DFS on $u$.
+    \item If $v$ can be reached, return YES. Else, return NO.
+  \end{itemize}
+\item The loop executes $E - (|V| - 1)$ times because that is the number of edges we need to remove to get a MST with $|V|$ vertices and $|V| - 1$ edges. Each iteration takes $O(|V| + |E|)$ times because of DFS. Therefore the total runtime is $$O( (|V| + |E|) \cdot (|E| - |V| + 1)).$$
+\end{enumerate}
+
+
+\section{Problem 5.23}
+The algorithm can be described as follows:
+\begin{itemize}
+  \item Let $E'$ be the set of all edges that touch a vertex in $U$.
+  \item Build a MST $T$ in $G'(V - U, E - E')$.
+  \item For each node $u$ in $U$, add the lightest edge that connects $u$ and $T$ to $T$.
+  \item Return $T$.
+\end{itemize}
+
+\section{Problem 5.29}
+\url{www.ece.northwestern.edu/~dda902/336/hw5-sol.pdf}
 
 \chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
