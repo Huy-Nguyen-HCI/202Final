@@ -5,6 +5,7 @@
 \usepackage{listings, color}
 \usepackage{hyperref}
 \usepackage{enumerate}
+\usepackage{graphics}
 
 
 \title{CS 202 Review}
@@ -35,6 +36,78 @@
 \begin{document}
 
 \tableofcontents
+
+
+\chapter[Chapter 4 Solution]{Distance in graph}
+
+\section{Problem 4.3}
+Modify the breadth first search algorithm as follows. Here each node has a property \co{dist}, the length of the shortest path from the source node to it, and a property \co{n}, the number of shortest paths from the source node to it. We update both as we visit each node. If we find a node whose \co{dist = n = 2} then there exists a cycle of length $4$.
+\begin{lstlisting}
+  bfsModified(Node u):
+    For all node v:
+      v.dist = INFINITY
+      v.n = 0
+    u.dist = 0
+    H = makeQueue(u)
+    while H is not empty:
+      Node s = h.poll()
+      for all node v adjacent to s:
+        if v.dist = INFINITY:
+          v.n ++
+          v.dist = s.dist + 1
+          H.add(v)
+        else:
+          if s.dist + 1 == v.dist:
+            // found another shortest path from u to v
+            v.n ++
+            if v.n == 2 && v.dist == 2:
+              // found a simple cycle of four
+              return TRUE
+    return FALSE
+\end{lstlisting}
+We call \co{bfsModified} on all vertices in the graph. The complexity is therefore $O(|V| ( |E| + |V|)) = O(|V|^3)$ because $|E| = O(|V|^2)$.
+
+\section{Problem 4.4}
+\begin{center} \includegraphics{dfs_fail.png} \end{center}
+In the above tree, the cycle edges are $EB$ and $EA$. $EB$ will give \co{level[E] - level[B] + 1 = 4 - 1 + 1 = 4}, while $EA$ will give \co{level[E] - level[A] + 1 = 4 - 0 + 1 = 5}. The shortest cycle, however, is $ABE$ with length $3$. \\
+The reason is that dfs can only detect all back edges but not all cycles; a back edge might belong to more than one cycle.
+
+\section{Problem 4.5}
+Use the \co{bfsModified} algorithm from 4.3:
+\begin{lstlisting}
+  bfs_modified(Node u, Node target):
+    For all node v:
+      v.dist = INFINITY
+      v.n = 0
+    u.dist = 0
+    H = makeQueue(u)
+    while H is not empty:
+      Node s = h.poll()
+      for all node v adjacent to s:
+        if v.dist = INFINITY:
+          // first time v is discovered, set number of shortest path to 1
+          v.n ++
+          v.dist = s.dist + 1
+          H.add(v)
+        else:
+          if s.dist + 1 == v.dist:
+            // found another shortest path from u to v
+            v.n ++
+    return target.n
+\end{lstlisting}
+
+\section{Problem 4.6}
+Consider the directed graph $G'$ formed by taking all the edges $\overrightarrow{(u, \co{prev}[u]}$. We note that the \co{prev} array is set in Dijkstra when
+\begin{lstlisting}
+  s = H.remove()
+  for v adjacent to s:
+    if v.dist > s.dist + l(v,s):
+      v.dist = s.dist + l(v,s)
+      v.prev = s
+\end{lstlisting}
+In other words, if we have an edge $\overrightarrow(a,b)$ in $G$, then $b = \co{prev}[a]$ so \co{b.dist > a.dist}. So if there is a path from a node $a$ to a node $c$ then \co{c.dist > a.dist}. If there is a cycle then there is an edge from a node $c$ to a node $a$ while there is also a path from $a$ to $c$. The former implies \co{a.dist > c.dist} while the latter implies \co{c.dist > a.dist}, so we have a contradiction.
+
+\section{Problem 4.7}
 
 \chapter[Chapter 5 Solution]{Greedy algorithm}
 
@@ -153,7 +226,7 @@ Let $S[i]$ be the maximum total profit we get from building some restaurants in 
   \item If restaurant $m_i$ should not be built, then $S[i] = S[i-1]$.
   \item If restaurant $m_i$ should be built, then let $c_i$ be the maximum index $j$ which yields $m_i - m_j \ge k$. We then have $\displaystyle S[i] = p_i + S[c_i]$.
 \end{enumerate}
-Therefore in general, $$S_i = \max \{ S[i-1], p_i + S[c_i]\}.$$
+Therefore in general, $$S[i] = \max \{ S[i-1], p_i + S[c_i]\}.$$
 To get the sequence of restaurants, keep an array $R[n]$ such that $R[i] = 1$ if restaurant $i$ is built in the optimal solution, and $R[i] = 0$ otherwise. When we calculate $S[i]$, if the max falls to case (1), $R[i] = 0$. Else, $R[i] = 1$. Output all the $R[i]$s that are $1$.
 
 \section{Problem 6.4}
