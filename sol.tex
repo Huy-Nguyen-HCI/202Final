@@ -37,6 +37,7 @@
 
 \tableofcontents
 
+\chapter[Chapter 3 Solution]{Decomposition of graphs}
 
 \chapter[Chapter 4 Solution]{Distance in graph}
 
@@ -131,11 +132,121 @@ Use Dijkstra's algorithm to find the shortest cycle going through a given node $
 Call the method on all nodes and find the min of the return values. Dijkstra takes $O(|V|^2)$ and is called $|V|$ times, so the runtime is $O(|V|^3)$.
 
 \section{Problem 4.12}
-\begin{enumerate}[(a)]
-\item The length of the shortest cycle containing $e = (u,v)$ is the sum of $w(e)$ and the shortest path from $u$ to $v$. \\
+The length of the shortest cycle containing $e = (u,v)$ is the sum of $w(e)$ and the shortest path from $u$ to $v$. \\
 Remove the edge $e = (u,v)$ from the graph and call Dijkstra's on $u$. The result is \co{v.dist} + $w(e)$.
+
+\section{Problem 4.13}
+\begin{enumerate}[(a)]
+  \item Iterate through $E$ and remove all edges whose lengths are larger than $L$. Then call bfs on $s$ and see if $t$ can be reached.
+  \item We use a modified version of Dijkstra's algorithm. Here \co{u.dist} is the maximum edge weight on the path from $s$ to $u$.
+  \begin{lstlisting}
+    dijkstra(s):
+      for all v in V:
+        v.prev = null
+        v.dist = INFINITY
+      s.dist = 0
+      H = makeQueue(V)
+      while H is not empty:
+        u = H.remove()
+        for all v adjacent to u:
+          if v.dist > max{u.dist, w(u,v)}:
+            v.dist = max{u.dist, w(u,v)}
+            v.prev = u
+  \end{lstlisting}
 \end{enumerate}
 
+\section{Problem 4.14}
+For all $u, v \in V$ we need to find $d(u,v_0) + d(v_0, v)$. \\
+Run Dijkstra's algorithm on $v_0$ we can find $d(v_0, v)$ for all $v \in V$. \\
+Consider the reverse graph $G'(V,E')$ such that there is an edge from $u$ to $v$ in $G$ if and only if there is an edge from $v$ to $u$ in $G'$. Run Dijkstra's algorithm on $v_0$ in $G'$ we get $d'(v_0, u)$ for all $u \in V$, which is also $d(u, v_0)$ in the original graph. 
+
+\section{Problem 4.15}
+Keep a property \co{count} in each node $u$, which indicates the number of shortest paths from $s$ to $u$. We modify Dijkstra's algorithm as follows:
+\begin{lstlisting}
+    dijkstra(s):
+      for all v in V:
+        v.prev = null
+        v.dist = INFINITY
+        v.count = 0
+      s.dist = 0
+      s.count = 1
+      H = makeQueue(V)
+      while H is not empty:
+        u = H.remove()
+        for all v adjacent to u:
+          if v.count == 0:
+            // first time v is visited
+            v.count ++
+          if v.dist > u.dist + w(u,v):
+            v.dist = u.dist + w(u,v)
+            v.prev = u
+          else if v.dist == u.dist + w(u,v):
+            // found another shortest path
+            v.count ++
+\end{lstlisting}
+Then, for all $u \in V$, \co{usp[u] = (u.count == 1)}.
+
+\section{Problem 4.17}
+\href{http://cs.stackexchange.com/questions/6797/modifying-dijkstras-algorithm-for-edge-weights-drawn-from-range-1-k}{\underline{See link}}
+
+\section{Problem 4.18}
+Keep a property \co{count} in each node $u$, which indicates the minimum number of edges in any shortest path from $s$ to $u$. We modify Dijkstra's algorithm as follows:
+\begin{lstlisting}
+    dijkstra(s):
+      for all v in V:
+        v.prev = null
+        v.dist = INFINITY
+      s.dist = 0
+      s.count = 0
+      H = makeQueue(V)
+      while H is not empty:
+        u = H.remove()
+        for all v adjacent to u:
+          if v.dist > u.dist + w(u,v):
+            v.dist = u.dist + w(u,v)
+            v.prev = u
+            v.count = u.count + 1
+          else if v.dist == u.dist + w(u,v):
+            // found another shortest path
+            if v.count > u.count + 1:
+              v.count = u.count + 1
+              v.prev = u
+\end{lstlisting}
+
+\section{Problem 4.19}
+Update the weight of all edges as follows:
+\begin{itemize}
+  \item For all edge $e$ coming from $s: w(e) = w(e) + cost[s]$.
+  \item For all edge $e = \overrightarrow{(u,v)}: w(e) = w(e) + cost[v]$.
+\end{itemize}
+Then disregard the costs of the vertices (because we have moved them to the edges) and run Dijkstra's algorimth on $s$.
+
+\section{Problem 4.20}
+The algorithm is as follows:
+\begin{itemize}
+  \item Run Dijkstra's algorithm on $s$ and $t$. Because the graph is undirected, we get $$d(s,u), d(u,s), d(t,u), d(u,t)$$ for all $t \in V$. Let $d(s,t) = M$.
+  \item For each edge $e = (u,v) \in E'$, calculate the length of the shortest path from $s$ to $t$ that includes $e$. This number is $$f(e) = \min \{ d(s,u) + w(e) + d(v,t), d(s,v) + w(e) + d(u,t) \}.$$
+  \item Compare $f(e)$ to $M$ and update $M = \min \{ M, f(e) \}$.
+\end{itemize}
+
+\section{Problem 5.21}
+\begin{enumerate}[(a)]
+\item Create a currency trading graph $G(V,E)$:
+\begin{itemize}
+  \item For each currency $i$ there is a node $v_i \in V$.
+  \item For all $u, v \in V (u \ne v)$ there is an edge from $u$ to $v$.
+  \item For all $v_i, v_j \in V: w(v_i, v_j) = \log \frac{1}{r_{i,j}} = - \log r_{i,j}$.
+\end{itemize}
+Therefore if $d = w(i,j)$ then one unit of $c_i$ can be converted into $2^d$ units of $c_j$.
+The best way to convert from $s$ to $t$ is the shortest path from node $v_s$ to $v_t$ in $G$, which can be found by Bellman-Ford's algorithm.
+
+\item
+The existence of an anomaly implies that $$r_{i_1, i_2} \cdot r_{i_2, i_3} \cdot \ldots \cdot r_{i_k, i_1} > 1,$$
+which is equivalent to $$\log \frac{1}{r_{i_1, i_2}} +  \log \frac{1}{r_{i_2, i_3}} +  \ldots + \log \frac{1}{r_{i_k, i_1}} < 0.$$
+In other words, $$w(v_{i_1}, v_{i_2}) + + w(v_{i_2, v_{i_3}}) + \ldots + w(v_{i_k}, v_{i_1}) < 0,$$
+So we have a negative cycle $i_1 \to i_2 \to i_3 \to \ldots \to i_k \to i_1.$ \\
+To detect if a negative cycle exists, use Bellman-Ford's algorithm. If it returns YES, there is an anomaly. Otherwise, there isn't.
+\end{enumerate}
 \chapter[Chapter 5 Solution]{Greedy algorithm}
 
 \section{Problem 5.3}
@@ -192,7 +303,7 @@ While there is an edge $e \in T_G \bigcap H$ such that $e \notin T_H$ do:
 After the loop we have $T_G \bigcap H \subset T_H$.
 
 \section{Problem 5.16}
-\url{http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2012/assignments/MIT6_046JS12_ps9_sol.pdf}
+\href{http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2012/assignments/MIT6_046JS12_ps9_sol.pdf}{\underline{See link}}
 
 \section{Problem 5.20}
 {\bf Perfect matching.} \\
@@ -239,7 +350,7 @@ The algorithm can be described as follows:
 \end{itemize}
 
 \section{Problem 5.29}
-\url{www.ece.northwestern.edu/~dda902/336/hw5-sol.pdf}
+\href{www.ece.northwestern.edu/~dda902/336/hw5-sol.pdf}{\underline{See link}}
 
 \chapter[Chapter 6 Solution]{Dynamic programming}
 \section{Problem 6.2}
@@ -267,12 +378,21 @@ S[i] = & \ (S[1] \and \co{dict(s[2 .. i]}) \\
 \end{aligned}$$
 where $s[j..i]$ is $s_j s_{j+1} \ldots s_i$.
 
+
+\section{Problem 6.5}
+\begin{enumerate}[(a)]
+\item Consider a column of $4$ squares. There can be either $0$ pebble, or $1$ pebble (4 ways to place it), or $2$ pebbles (either place it on square $1$ and $3$ or $2$ and $4$). Therefore there are a total of $7$ patterns on a column.
+\item Let $T[i,j]$ be the max sum we get from putting pebbles on the table from from column $1$ to $i$ using the pattern $j$. Let $C(i,j)$ be the value we get when putting a pebble on square $(i,j)$. We have $$T[i,j] = C(i,j) + \max \{ T[i-1,j'] \}, $$
+where $j' \in \{0,1,\ldots,6\}$ and pattern $j'$ is compatible with pattern $j$.
+\end{enumerate}
+
 \section{Problem 6.6}
 Let the input string be $x_1 x_2 \ldots x_n$. \\
 Let $Z = \{a,b,c\}$ and let $T[i,j] \subset Z$ be the set of the possible values that the product $x_i x_{i+1} \ldots x_{j}$ can yield with all possible parenthesizations. \\
 We see that $T[i,i] = x_i$ for all $1 \le i \le n$. We need to compute $T[1,n]$. \\
 Define $A \times B$ as $\{ a \cdot b | a \in A, b \in B\}$. \\
-We note that $T[i, i+1] = T[i,i] \bigcup T[i+1, i+1]$ and $T[i,i+2] = (T[i,i] \times T[i+1, i+2]) \bigcup (T[i,i+1] \times T[i+2,i+2])$ (to put it another way, $abc$ can be written as $(a)(bc)$ or $(ab)(c)$). \\
+We note that $$T[i, i+1] = T[i,i] \times T[i+1, i+1]$$ and $$T[i,i+2] = (T[i,i] \times T[i+1, i+2]) \bigcup (T[i,i+1] \times T[i+2,i+2]).$$
+(to put it another way, $xyz$ can be written as $(x)(yz)$ or $(xy)(z)$) \\
 We therefore see that we already have $$T[1,1], T[2,2], T[3,3], \ldots,$$
 from which we can calculate $$T[1,2], T[2,3], T[3,4], \ldots,$$
 from which we can calculate $$T[1,3], T[2,4], T[3,5], \ldots $$
@@ -280,7 +400,8 @@ and eventually we can expand to $T[1,n]$, which is what we need to find.\\
 In other words, $$T[i, i + s] = \bigcup_{i \le k < i + s} (T[i,k] \times T[k+1, i + s]).$$
 The algorithm is as follows:
 \begin{lstlisting}
-  for i = 1 to n: T[i,i] = x[i].
+  for i = 1 to n: 
+    T[i,i] = x[i].
   for s = 1 to n-1:
     for i = 1 to n - s:
       T[i, i + s] = empty
@@ -317,7 +438,7 @@ In general we have $$E[i,j] = \begin{cases} E[i-1,j-1] + 1 \text{ if } x_i = y_j
 Let $d[i,j]$ be the distance between point $i$ and $j$. We have $$\begin{cases} A[i,i] = 0 \\ A[i, i + 1] = 0 \\ A[i, i+2] = 0 \\ A[i,j] = \displaystyle \min_{i < k < j} \{ A[i,k] + A[k,j] + d[i,k] + d[k,j]\} \end{cases}$$
 
 \section{Problem 6.13}
-A sequence where a greedy approach would fail is $$1000 \quad 2000 \quad 1.$$
+A sequence where a greedy approach would fail is $$1000 \quad 2000 \quad 500 \quad 1.$$
 Let $E[i,j]$ be the maximum value the first player can have by picking cards from the set of cards $s_i, s_{i+1}, \ldots, s_j$. \\
 We see that $E[i,j] = 0$ if $i \le j$. In general, $$\begin{aligned} E[i,j] = \max\{ & v_i + \min \{ E[i + 2, j] - v_{i+1}, E[i + 1, j - 1] - v_j \}, \\ & v_j + \min \{ E[i+1,j-2] - v_{j-1}, E[i+2,j-1] - v_{i+1}\}\}. \end{aligned}$$
 \end{document}
