@@ -103,11 +103,38 @@ Consider the directed graph $G'$ formed by taking all the edges $\overrightarrow
   for v adjacent to s:
     if v.dist > s.dist + l(v,s):
       v.dist = s.dist + l(v,s)
-      v.prev = s
+      prev[v] = s
 \end{lstlisting}
-In other words, if we have an edge $\overrightarrow(a,b)$ in $G$, then $b = \co{prev}[a]$ so \co{b.dist > a.dist}. So if there is a path from a node $a$ to a node $c$ then \co{c.dist > a.dist}. If there is a cycle then there is an edge from a node $c$ to a node $a$ while there is also a path from $a$ to $c$. The former implies \co{a.dist > c.dist} while the latter implies \co{c.dist > a.dist}, so we have a contradiction.
+In other words, if we have an edge $\overrightarrow{(a,b)}$ in $G$, then $b = \co{prev}[a]$ so \co{b.dist > a.dist}. So if there is a path from a node $a$ to a node $c$ then \co{c.dist > a.dist}. If there is a cycle then there is an edge from a node $c$ to a node $a$ while there is also a path from $a$ to $c$. The former implies \co{a.dist > c.dist} while the latter implies \co{c.dist > a.dist}, so we have a contradiction.
 
 \section{Problem 4.7}
+First get the shortest path distance of all vertices using only the edges in $E'$. Now remove all the edges in $E'$. We are left with the graph $G'(V, E - E')$. Run \co{update} on all edges in $E'$:
+\begin{lstlisting}
+update(e = (u,v)){
+  v.dist = min { v.dist, u.dist + w(e)}
+}
+\end{lstlisting}
+If any vertex has its \co{dist} changed, then the \co{dist} we obtained from $T$ is not correct, so $T$ is not the shortest path tree and we return false. Otherwise, all \co{dist}s are correct so we return true.
+
+\section{Problem 4.8}
+Dijkstra's algorithm only cares about the weight of the paths, not their lengths. Adding a constant to the weight of each edge will change the graph, because two paths that previously had same weights but different lengths will not have different weights. \\
+Example: Consider $\Delta ABC$ where $AB = -2, BC = 2, CA = 1$. The shortest path from $A$ to $C$ is $A \to B \to C$. If we add $2$ to each edge weight, $AB = 0, BC = 4, CA = 3$ so the shortest path from $A$ to $C$ is now $AC$.
+
+\section{Problem 4.9}
+Let $U$ be the set of edges connecting to $S$. Add a large constant to all edges in $U$ so that they all become positive. Since any shortest path from $S$ to any vertex includes exactly one edge in $U$, the relative weight of the shortest paths remain the same, so Dijkstra's algorithm still works.
+
+\section{Problem 4.10}
+Run a modified version of Bellman-ford. Because we know no path can have more than $k$ edges, the loop only needs to execute $k$ times, not $|V| - 1$ times. The runtime is therefore $O(k |E|)$.
+
+\section{Problem 4.11}
+Use Dijkstra's algorithm to find the shortest cycle going through a given node $n$: After we get the \co{dist} of all nodes from $n$, find $$\min_{u : n \in \co{u.adj}} \{ \co{u.dist} + w(u,s)\}.$$
+Call the method on all nodes and find the min of the return values. Dijkstra takes $O(|V|^2)$ and is called $|V|$ times, so the runtime is $O(|V|^3)$.
+
+\section{Problem 4.12}
+\begin{enumerate}[(a)]
+\item The length of the shortest cycle containing $e = (u,v)$ is the sum of $w(e)$ and the shortest path from $u$ to $v$. \\
+Remove the edge $e = (u,v)$ from the graph and call Dijkstra's on $u$. The result is \co{v.dist} + $w(e)$.
+\end{enumerate}
 
 \chapter[Chapter 5 Solution]{Greedy algorithm}
 
