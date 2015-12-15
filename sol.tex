@@ -38,9 +38,115 @@
 \tableofcontents
 
 \chapter[Chapter 3 Solution]{Decomposition of graphs}
+\section{Problem 3.7}
+\begin{enumerate}[(a)]
+	\item We use DFS as follows:
+	\begin{lstlisting}
+		boolean bipartite = true
+		check_bipartite:
+			for all v in V:
+				v.visited = false
+				v.color = 0
+			for all v in V:
+				if v.visited == false:
+					explore(v)
+			return bipartite
+
+		explore(v):
+			v.visited = true
+			for all u adjacent to v:
+				if u.visited == false:
+					u.color = !v.color
+					explore(u)
+				else if u.color == v.color:
+					bipartite = false
+
+	\end{lstlisting}
+	\item 
+	If the undirected graph $G=(V,E)$ is bipartite then all vertices in $V$ belong to one of the two sets $V_1$ or $V_2$. Every edge leads from one set to the other. So if we have a cycle that starts and ends in $V_1$, its length must be an even number. Therefore if $G$ is bipartite it has no odd cycle. \\
+	Now suppose $G$ has no odd cycle. For each connected component $C$ of $G$, let $v_0$ be a random vertex in $C$. For any vertex $v$ in $C$, color $v$ red if the shortest path from $v_0$ to $v$ has even length, and black if the shortest path from $v_0$ to $v$ has odd length. If there is an edge between two vertices with the same color, say $u$ and $v$, then $G$ has an odd cycle ($v_0 \to v \to u \to v_0$). Therefore if $G$ has no odd cycle then there is no edge connecting any two vertices with the same color. The set of vertices with red color and the set of those with blue colors are two disjoint sets that make $G$ bipartite.
+	\item $3$ colors. Use DFS and color the vertices in red or blue like part a. When an edge connecting two vertices of the same color is encountered (there is exactly one such edge), change the color of either of the two to yellow.
+\end{enumerate}
+
+\section{Problem 3.8}
+Create a directed graph $G$ as follows:
+\begin{itemize}
+	\item Each vertex stores a tuple $(a,b,c)$, where $a,b,c$ are the amount of water currently in the 10-pint, 7-pint and 4-pint containers respectively.
+	\item There is an edge from $u$ to $v$ iff we can pour water from one container to another in $u$ to get $v$.
+\end{itemize}
+We start with the root vertex $r = (0,7,4)$, and keep creating new child nodes to represent all possible states of the 3 containers. If a vertex whose value has the form $(x,y,2)$ or $(x,2,y)$ is encountered, return true. Else return false.
+
+\section{Problem 3.9}
+\begin{lstlisting}
+	for all v in V:
+		v.degree = 0
+	for all v in V:
+		for all u adjacent to v:
+			v.degree ++
+	for all v in V:
+		twodegree[v] = 0
+		for all u adjacent to v:
+			twodegree[v] += u.degree
+\end{lstlisting}
+
+\section{Problem 3.11}
+Let $e = (u,v)$. Remove $e$ from the graph and run DFS on $u$. If $v$ is marked as visited, then there is a cycle containing $e$. Otherwise there isn't.
+
+\section{Problem 3.12}
+False. $\{u,v\}$ can be a cross edge. 
+
+\section{Problem 3.13}
+\begin{enumerate}[(a)]
+	\item We prove that a tree always has a leaf. Let the vertices in the tree be $v_1, v_2, \ldots, v_n$ and let $d(i)$ be the degree of vertex $i$. Then we have $$\sum_{i=1}^n d(i) = 2 | E | = 2(n-1).$$
+	If there is no leaf then $d(i) \ge 2 \ \forall i \Rightarrow \displaystyle 2(n-1) = \sum_{i=1}^n d(i) \ge 2n (!)xw$. \\
+	Now we consider the DFS tree of the graph. The node to remove is one of its leaves.
+	\item Consider $\Delta ABC$ with edges $\overrightarrow{AB}, \overrightarrow{BC}, \overrightarrow{CA}$.
+	\item Graph consists of vertex $A$ and $B$ with no edge.
+\end{enumerate}
+
+\section{Problem 3.15}
+\begin{enumerate}[(a)]
+	\item Consider a graph where each intersection in the city is a vertex and there is an edge from $u$ to $v$ if one can go along some one-way streets from $u$ to reach $v$. Break down the graph into its SCCs and check if the number of SCCs is $1$. If it is, the claim is true; otherwise it's false.
+	\item We want to see if given a specific vertex $T$, is it true that for every other vertex $v$, if $v$ is reachable from $t$ then $t$ is reachable from $v$. Break down the graph into its SCCs. Check that there is no outgoing edge from the SCC that contains $T$.
+\end{enumerate}
+
+\section{Problem 3.16}
+Each vertex has a property \co{sem}, which indicates the minimum number of semester required to reach it and finish it. First linearize the dag so we get the course order $c[1], c[2], \ldots, c[n]$. Then traverse the edges according to this order:
+\begin{lstlisting}
+for i = 1 to n:
+	for v adjacent to c[i]:
+		v.sem = max {v.sem, c[i].sem + 1}
+\end{lstlisting}
+The max \co{sem} among all vertices is the minimum number of semesters required.
+
+\section{Problem 3.17}
+Use DFS on the root node to update the preorder and postorder of all vertices. $u$ is an ancestor of $v$ if and only if $$pre(u) < pre(v) < post(v) < post(u).$$
+
+\section{Problem 3.19}
+We use DFS as follows:
+\begin{lstlisting}
+dfs:
+	for all v in V:
+		v.visited = false
+		z[v] = x[v]
+	explore(root)
+
+explore(v):
+	v.visited = true
+	for all u adjacent to v:
+		if u.visited == false:
+			explore(u)
+			z[v] = max{ x[v], z[u]}
+\end{lstlisting}
+
+\section{Problem 3.21}
+A graph $G$ has an odd-length directed cycle if and only if one (or more) of its SCCs is nonbipartite (when treated as an undirected graph):
+\begin{itemize}
+	\item An odd-length directed cycle must belong to a SCC $C$. When it is treated as an undirected graph, the cycle becomes an odd-length directed cycle. Therefore $C$ is nonbipartite in undirected mode.
+	\item Suppose a SCC $C$ is nonbipartite (when treated as undirected). So there is an odd-length, undirected cycle in $C$. Now if this is also a directed cycle, we are done. Otherwise, if edge connecting $v$ and $w$ is pointing in the wrong direction (i.e. we have $\overrightarrow{(w,v)}$ while we want $\overrightarrow{(v,w)}$, we can replace it with an odd-length path pointing in the opposite direction. Note that there exists a directed path $P$ from $v$ to $w$ because $v$ and $w$ belong to the same SCC. If $P$ has odd length, replace the edge $\overrightarrow{(w,v)}$ with $P$. If $P$ has even length, then $P$ combines with $\overrightarrow{(w,v)}$ is an odd cycle.
+\end{itemize}
 
 \chapter[Chapter 4 Solution]{Distance in graph}
-
 \section{Problem 4.3}
 Modify the breadth first search algorithm as follows. Here each node has a property \co{dist}, the length of the shortest path from the source node to it, and a property \co{n}, the number of shortest paths from the source node to it. We update both as we visit each node. If we find a node whose \co{dist = n = 2} then there exists a cycle of length $4$.
 \begin{lstlisting}
@@ -229,7 +335,7 @@ The algorithm is as follows:
   \item Compare $f(e)$ to $M$ and update $M = \min \{ M, f(e) \}$.
 \end{itemize}
 
-\section{Problem 5.21}
+\section{Problem 4.21}
 \begin{enumerate}[(a)]
 \item Create a currency trading graph $G(V,E)$:
 \begin{itemize}
